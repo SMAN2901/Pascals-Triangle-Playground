@@ -5,7 +5,7 @@ export interface SimpleTriangle {
     filters: SimpleNumberFilter[];
 }
 export class Triangle {
-    readonly nums: number[][] = [];
+    readonly nums: bigint[][] = [];
     readonly colored: boolean[][] = [];
 
     get height(): number {
@@ -36,7 +36,7 @@ export class Triangle {
                 if(j) this.nums[i][j] = (j < k) 
                     ? (this.nums[i - 1][j - 1] + this.nums[i - 1][j])
                     : (this.nums[i - 1][j - 1] + this.nums[i - 1][j - 1]);
-                else this.nums[i][j] = 1;
+                else this.nums[i][j] = BigInt(1);
 
                 this.colored[i][j] = this.filter(this.nums[i][j]);
             }
@@ -53,7 +53,7 @@ export class Triangle {
         }
     }
 
-    filter(x: number): boolean {
+    filter(x: bigint): boolean {
         for(let f of this.filters) {
             if(!f.active) continue;
             if(!f.validate(x)) return false;

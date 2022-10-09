@@ -7,7 +7,7 @@ import { TriangleView } from "../../models/TriangleView";
 const TriangleImage = (
     { triangle: t, settings }: { triangle: Triangle, settings: TriangleView }
 ) => {
-    const [hoveredNumber, setHoveredNumber] = useState<number>(0);
+    const [hoveredNumber, setHoveredNumber] = useState<string>("0");
     const [hoveredColor, setHoveredColor] = useState<boolean>(false);
     const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
     const R = settings.circleRadius;
@@ -37,7 +37,7 @@ const TriangleImage = (
 
                 if(d <= R) {
                     if(p + p > h) p = h - p;
-                    setHoveredNumber(t.nums[h][p]);
+                    setHoveredNumber(t.nums[h][p].toString());
                     setHoveredColor(t.colored[h][p]);
                     setSnackbarOpen(true);
                     return;

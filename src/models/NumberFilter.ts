@@ -1,4 +1,4 @@
-export type NumberValidator = (x: number, y?: number[]) => boolean;
+export type NumberValidator = (x: bigint, y?: bigint[]) => boolean;
 
 export interface SimpleNumberFilter {
     name: string;
@@ -13,7 +13,7 @@ export class NumberFilter {
     checked: boolean = true;
     inputRequired: boolean = false;
     inputValue: string = "";
-    inputArray: number[] = [];
+    inputArray: bigint[] = [];
     inputChanged: boolean = false;
     
     constructor(
@@ -53,14 +53,23 @@ export class NumberFilter {
         this.active = !this.active;
     }
 
-    private parseArray(value: string): number[] {
+    toBigInt(s: string): bigint | number {
         try {
-            let a: number[] = [];
+            return BigInt(s);
+        }
+        catch(e) {
+            return NaN;
+        }
+    }
+
+    private parseArray(value: string): bigint[] {
+        try {
+            let a: bigint[] = [];
             let b: string[] = value.split(new RegExp("[^\\d+-]"));
             
             for(let s of b) {
-                let x = parseInt(s);
-                if(!isNaN(x)) a.push(x);
+                let x = this.toBigInt(s);
+                if(typeof x === "bigint") a.push(x);
             }
             
             return a;
@@ -70,7 +79,7 @@ export class NumberFilter {
         }
     }
 
-    validate(x: number): boolean {
+    validate(x: bigint): boolean {
         if(this.inputChanged) {
             this.inputArray = this.inputRequired ? this.parseArray(this.inputValue) : [];
             this.inputChanged = false;
