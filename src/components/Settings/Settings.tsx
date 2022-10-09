@@ -183,6 +183,7 @@ const Settings = (
                 anchorEl={pickerAnchor}
                 open={pickerOpen}
                 onClose={() => setPickerOpen(false)}
+                MenuListProps={{ sx: { padding: 0 }}}
             >
                 <SketchPicker
                     color={pickerColor}
