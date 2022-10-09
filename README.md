@@ -2,6 +2,8 @@
 
 A web app to observe patterns in Pascal's triangle using customized filters.
 
+### Try it here: <a href="https://pascalplayground.web.app/" target="_blank">pascalplayground.web.app</a>
+
 [![Screenshot-454.png](https://i.postimg.cc/ncyJHS0V/Screenshot-454.png)](https://postimg.cc/crBjhmpP)
 
 ### Choose filters
