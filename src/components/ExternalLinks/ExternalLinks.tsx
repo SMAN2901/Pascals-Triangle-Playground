@@ -1,5 +1,6 @@
 import { Handshake, Person, Workspaces } from "@mui/icons-material";
 import { Divider, Link, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import React from "react";
 
 const ExternalLinks = () => {
     const links = [
@@ -22,7 +23,7 @@ const ExternalLinks = () => {
 
     return (
         <>
-            {links.map((item) => <>
+            {links.map((item) => <React.Fragment key={item.name}>
                 <Divider light={false} component="li" />
                 <ListItem 
                     component={Link} 
@@ -33,7 +34,7 @@ const ExternalLinks = () => {
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText primary={item.name}/>
                 </ListItem>
-            </>)}
+            </React.Fragment>)}
         </>
     );
 }
