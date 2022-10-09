@@ -14,7 +14,7 @@ const Navbar = (
                     size="small"
                     edge="start"
                     aria-label="menu"
-                    sx={{ mr: 2, color: "HighlightText" }}
+                    sx={{ mr: 2, color: "primary.contrastText" }}
                     onClick={() => toggleDrawer()}
                 >
                     { drawerOpen ? <KeyboardArrowLeft /> : <Menu /> }

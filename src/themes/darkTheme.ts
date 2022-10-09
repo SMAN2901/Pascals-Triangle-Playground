@@ -5,6 +5,7 @@ export const DARK_THEME: ThemeOptions = createTheme({
         mode: "dark",
         primary: {
             main: '#42a5f5',
+            contrastText: "#fff"
         },
         secondary: {
             main: '#ffcc80',
