@@ -1,4 +1,6 @@
-import { isEven, isOdd, multipleOf, multipleOfAny, divisorOf, divisorOfAny, equals } from "../math/basic";
+import { isEven, isOdd, multipleOf, multipleOfAny, divisorOf, divisorOfAny, equals, powerOf } from "../math/basic";
+import { isFib } from "../math/fibonacci";
+import { isPrime } from "../math/prime";
 import { NumberFilter } from "./NumberFilter";
 
 let [inputRequired, active, checked] = [true, true, true];
@@ -10,6 +12,10 @@ const multipleOfFilter = new NumberFilter("Multiple of", multipleOf, inputRequir
 const multipleOfAnyFilter = new NumberFilter("Multiple of Any", multipleOfAny, inputRequired, !active, !checked);
 const divisorOfFilter = new NumberFilter("Divisor of", divisorOf, inputRequired, !active, !checked);
 const divisorOfAnyFilter = new NumberFilter("Divisor of Any", divisorOfAny, inputRequired, !active, !checked);
+const powerOfFilter = new NumberFilter("Power of", powerOf, inputRequired, !active, !checked);
+
+const primeFilter = new NumberFilter("Prime", isPrime, !inputRequired, !active, !checked);
+const fibonacciFilter = new NumberFilter("Fibonacci", isFib, !inputRequired, !active, !checked);
 
 export const FILTER_LIST = [
     oddFilter,
@@ -18,5 +24,8 @@ export const FILTER_LIST = [
     multipleOfFilter,
     multipleOfAnyFilter,
     divisorOfFilter,
-    divisorOfAnyFilter
+    divisorOfAnyFilter,
+    powerOfFilter,
+    primeFilter,
+    fibonacciFilter
 ];

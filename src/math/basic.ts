@@ -58,6 +58,41 @@ const divisorOfAny: NumberValidator = (x: bigint, a?: bigint[]): boolean => {
     return false;
 }
 
+const getLog = (x: bigint, y: bigint): [bigint, bigint] => {
+    let z = x, p = x, l = x - x;
+
+    while(z <= y) {
+        l++;
+        p = z;
+        z *= x
+    }
+
+    return [l, p];
+}
+
+const powerOf: NumberValidator = (x: bigint, a?: bigint[]): boolean => {
+    if(!a || x === BigInt(1)) return true;
+
+    for(let y of a) {
+        let neg = false;
+        
+        if(y < BigInt(0)) {
+            y = -y;
+            neg = true;
+        }
+
+        if(y < x) return false;
+
+        let [l, p] = getLog(x, y);
+
+        if(p !== y) return false;
+
+        if(neg && (l & BigInt(1)) > BigInt(0)) return false;
+    }
+
+    return true;
+} 
+
 export { 
     isEven, 
     isOdd, 
@@ -65,5 +100,6 @@ export {
     multipleOf, 
     multipleOfAny, 
     divisorOf,
-    divisorOfAny
+    divisorOfAny,
+    powerOf
 };
