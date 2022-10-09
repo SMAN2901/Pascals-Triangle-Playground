@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import { Triangle } from "../../models/Triangle";
-import { useTheme } from "@mui/material/styles";
 import { Alert, Snackbar, Typography } from "@mui/material";
-import { TripOrigin } from "@mui/icons-material";
 import style from "./TriangleImage.module.scss";
+import { TriangleView } from "../../models/TriangleView";
 
 const TriangleImage = (
-    { triangle: t, height }: { triangle: Triangle, height: number }
+    { triangle: t, settings }: { triangle: Triangle, settings: TriangleView }
 ) => {
-    const theme = useTheme();
     const [hoveredNumber, setHoveredNumber] = useState<number>(0);
     const [hoveredColor, setHoveredColor] = useState<boolean>(false);
     const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const R = settings.circleRadius;
 
-    const R: number = 3;
     let a: number[] = [];
 
-    for(let i = 0; i < height; i++) {
+    for(let i = 0; i < settings.height; i++) {
         a.push(i);
     }
 
@@ -26,8 +24,8 @@ const TriangleImage = (
         let y = e.clientY - top;
 
         let h = Math.floor(y / (R + R));
-        let l = (height - 1 - h) * R;
-        let r = height * (R + R) - l;
+        let l = (settings.height - 1 - h) * R;
+        let r = settings.height * (R + R) - l;
 
         if(x >= l && x <= r) {
             let p = Math.floor((x - l) / (R + R));
@@ -38,6 +36,7 @@ const TriangleImage = (
                 let d = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
 
                 if(d <= R) {
+                    if(p + p > h) p = h - p;
                     setHoveredNumber(t.nums[h][p]);
                     setHoveredColor(t.colored[h][p]);
                     setSnackbarOpen(true);
@@ -45,22 +44,20 @@ const TriangleImage = (
                 }
             }
         }
-
-        //setHoveredNumber(0);
     }
 
-    const getRow = (i: number) => (
-        <React.Fragment key={i}>
-            {t.nums[i].map((x, j) => (
-                <circle
+    const getRow = (i: number, reverse: boolean = false) => (
+        <React.Fragment key={(reverse ? "R" : "L") + i}>
+            {t.nums[i].map((_, j) => (
+                (!reverse || (reverse && i - j > j)) && <circle
                     className={style.circle}
-                    key={j}
-                    cx={j * (R + R) + R + (height - 1 - i) * R}
+                    key={(reverse ? "R" : "L") + j}
+                    cx={(reverse ? (i - j) : j) * (R + R) + R + (settings.height - 1 - i) * R}
                     cy={i * (R + R) + R}
                     r={R}
                     stroke="transparent"
                     strokeWidth={1}
-                    fill={t.colored[i][j] ? theme.palette.secondary.main : theme.palette.primary.main}
+                    fill={t.colored[i][j] ? settings.highlightColor : settings.color}
                 ></circle>
             ))}
         </React.Fragment>
@@ -69,28 +66,24 @@ const TriangleImage = (
     return (
         <>
             <svg 
-                width={height * (R + R)} 
-                height={height * (R + R)}
+                id="triangleSVG"
+                width={settings.height * (R + R)} 
+                height={settings.height * (R + R)}
                 onMouseMove={(e) => handleHover(e)}
             >
                 {a.map((i) => getRow(i))}
+                {a.map((i) => getRow(i, true))}
             </svg>
             <Snackbar 
                 open={snackbarOpen}
                 autoHideDuration={6000} 
                 onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                sx={{ mt: 4 }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
                 <Alert
-                    variant="outlined"
-                    color="info"
-                    icon={<TripOrigin 
-                        fontSize="small" 
-                        color={hoveredNumber ? (hoveredColor ? "secondary" : "primary") : "disabled"}
-                        sx={{ pt: 0.4 }}
-                    ></TripOrigin>}
-                    sx={{ minWidth: "100px" }}
+                    variant="filled"
+                    color={hoveredColor ? "warning" : "info"}
+                    icon={false}
                 >
                     <Typography 
                         variant="button" 

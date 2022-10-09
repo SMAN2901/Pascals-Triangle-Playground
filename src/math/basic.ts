@@ -8,6 +8,10 @@ const isOdd: NumberValidator = (x: number): boolean => {
     return (x & 1) ? true : false;
 }
 
+const equals: NumberValidator = (x: number, a?: number[]): boolean => {
+    return (a && a.length === 1 && x === a[0]) ? true : false;
+}
+
 const multipleOf: NumberValidator = (x: number, a?: number[]): boolean => {
     if(!a) return true;
 
@@ -57,6 +61,7 @@ const divisorOfAny: NumberValidator = (x: number, a?: number[]): boolean => {
 export { 
     isEven, 
     isOdd, 
+    equals,
     multipleOf, 
     multipleOfAny, 
     divisorOf,

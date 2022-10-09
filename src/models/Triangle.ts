@@ -1,5 +1,9 @@
-import { NumberFilter } from "./NumberFilter";
+import { NumberFilter, SimpleNumberFilter } from "./NumberFilter";
 
+export interface SimpleTriangle {
+    height: number;
+    filters: SimpleNumberFilter[];
+}
 export class Triangle {
     readonly nums: number[][] = [];
     readonly colored: boolean[][] = [];
@@ -14,6 +18,13 @@ export class Triangle {
         this.filters = filters;
     }
 
+    toSimpleObject(): SimpleTriangle {
+        return {
+            height: this.height,
+            filters: this.filters.map(f => f.toSimpleObject())
+        };
+    }
+
     compute(height: number) {
         let i = this.height;
 
@@ -21,11 +32,12 @@ export class Triangle {
             this.nums.push([]);
             this.colored.push([]);
 
-            this.nums[i][0] = this.nums[i][i] = 1;
-            this.colored[i][0] = this.colored[i][i] = this.filter(1);
+            for(let j = 0, k = i; j <= k; j++, k--) {
+                if(j) this.nums[i][j] = (j < k) 
+                    ? (this.nums[i - 1][j - 1] + this.nums[i - 1][j])
+                    : (this.nums[i - 1][j - 1] + this.nums[i - 1][j - 1]);
+                else this.nums[i][j] = 1;
 
-            for(let j = 1; j < i; j++) {
-                this.nums[i][j] = this.nums[i - 1][j - 1] + this.nums[i - 1][j];
                 this.colored[i][j] = this.filter(this.nums[i][j]);
             }
 
@@ -35,7 +47,7 @@ export class Triangle {
 
     updateColor() {
         for(let i = 0; i < this.nums.length; i++) {
-            for(let j = 0; j < this.nums[i].length; j++) {
+            for(let j = 0, k = i; j <= k; j++, k--) {
                 this.colored[i][j] = this.filter(this.nums[i][j]);
             }
         }

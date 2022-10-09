@@ -1,22 +1,38 @@
 import { Checkbox, ListItem, ListItemIcon, ListItemText, Switch, TextField } from "@mui/material";
+import { useState } from "react";
 import { NumberFilter } from "../../models/NumberFilter";
 
 const Filter = (
     { filter, refreshTriangle }: { filter: NumberFilter, refreshTriangle: () => void }
 ) => {
+    const [filterState] = useState<NumberFilter>(filter.getClone());
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+
     const toggleActive = () => {
-        filter.toggleActive();
-        refreshTriangle();
+        filterState.toggleActive();
+        setUpdateToDo();
     };
 
     const toggleChecked = () => {
-        filter.toggle();
-        refreshTriangle();
+        filterState.toggle();
+        setUpdateToDo();
     };
 
     const inputChanged = (value: string) => {
-        filter.inputValue = value;
-        filter.inputChanged = true;
+        filterState.inputValue = value;
+        setUpdateToDo(true);
+    }
+
+    const setUpdateToDo = (inputChanged: boolean = false) => {
+        if(timeoutId) clearTimeout(timeoutId);
+        setTimeoutId(setTimeout(() => updateFilter(inputChanged), 500));
+    }
+
+    const updateFilter = (inputChanged: boolean = false) => {
+        filter.active = filterState.active;
+        filter.checked = filterState.checked;
+        filter.inputValue = filterState.inputValue;
+        filter.inputChanged = inputChanged;
         refreshTriangle();
     }
 
@@ -26,26 +42,26 @@ const Filter = (
                 <Checkbox
                   edge="start"
                   size="small"
-                  checked={filter.active}
+                  checked={filterState.active}
                   onChange={() => toggleActive()}
                   tabIndex={-1}
                   disableRipple
                 />
             </ListItemIcon>
-            {!filter.inputRequired && <ListItemText primary={filter.name}/>}
-            {!filter.inputRequired && <Switch 
+            {!filterState.inputRequired && <ListItemText primary={filterState.name}/>}
+            {!filterState.inputRequired && <Switch 
                 size="small"
-                checked={filter.checked}
-                disabled={!filter.active}
+                checked={filterState.checked}
+                disabled={!filterState.active}
                 onChange={() => toggleChecked()} 
             />}
-            {filter.inputRequired && <TextField
+            {filterState.inputRequired && <TextField
                 size="small"
                 variant="outlined"
-                label={filter.name}
+                label={filterState.name}
                 placeholder="1,2,3"
-                disabled={!filter.active}
-                value={filter.inputValue}
+                disabled={!filterState.active}
+                value={filterState.inputValue}
                 onChange={(e) => inputChanged(e.currentTarget.value)}
                 inputProps={{ sx: { fontSize: 14 }}}
                 InputLabelProps={{ sx: { fontSize: 14 }}}

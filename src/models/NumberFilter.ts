@@ -1,5 +1,11 @@
 export type NumberValidator = (x: number, y?: number[]) => boolean;
 
+export interface SimpleNumberFilter {
+    name: string;
+    active: boolean;
+    checked: boolean;
+    inputValue: string;
+}
 export class NumberFilter {
     f: NumberValidator;
     name: string = "";
@@ -22,6 +28,21 @@ export class NumberFilter {
         this.inputRequired = inputRequired === undefined ? false : inputRequired;
         this.active = active === undefined ? true : active;
         this.checked = checked === undefined ? true : checked;
+    }
+
+    toSimpleObject(): SimpleNumberFilter {
+        return {
+            name: this.name,
+            active: this.active,
+            checked: this.checked,
+            inputValue: this.inputValue
+        };
+    }
+
+    getClone(): NumberFilter {
+        let f = new NumberFilter(this.name, this.f, this.inputRequired, this.active, this.checked);
+        f.inputValue = this.inputValue;
+        return f;
     }
 
     toggle() {
