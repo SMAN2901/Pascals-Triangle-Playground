@@ -65,7 +65,7 @@ export class NumberFilter {
     private parseArray(value: string): bigint[] {
         try {
             let a: bigint[] = [];
-            let b: string[] = value.split(new RegExp("[^\\d+-]"));
+            let b: string[] = value.split(new RegExp("[^\\d+-]")).filter(Boolean);
             
             for(let s of b) {
                 let x = this.toBigInt(s);
