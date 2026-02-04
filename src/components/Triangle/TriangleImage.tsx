@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Triangle } from "../../models/Triangle";
 import { Alert, Snackbar, Typography } from "@mui/material";
-import style from "./TriangleImage.module.scss";
 import { TriangleView } from "../../models/TriangleView";
 
 const TriangleImage = (
@@ -10,15 +9,11 @@ const TriangleImage = (
     const [hoveredNumber, setHoveredNumber] = useState<string>("0");
     const [hoveredColor, setHoveredColor] = useState<boolean>(false);
     const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+    const [hoveredCell, setHoveredCell] = useState<{r: number, c: number} | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
     const R = settings.circleRadius;
 
-    let a: number[] = [];
-
-    for(let i = 0; i < settings.height; i++) {
-        a.push(i);
-    }
-
-    const handleHover = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    const handleHover = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let { left, top } = e.currentTarget.getBoundingClientRect();
         let x = e.clientX - left;
         let y = e.clientY - top;
@@ -36,6 +31,8 @@ const TriangleImage = (
                 let d = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
 
                 if(d <= R) {
+                    setHoveredCell({r: h, c: p});
+
                     if(p + p > h) p = h - p;
                     setHoveredNumber(t.nums[h][p].toString());
                     setHoveredColor(t.colored[h][p]);
@@ -44,36 +41,73 @@ const TriangleImage = (
                 }
             }
         }
+        setHoveredCell(null);
     }
 
-    const getRow = (i: number, reverse: boolean = false) => (
-        <React.Fragment key={(reverse ? "R" : "L") + i}>
-            {t.nums[i].map((_, j) => (
-                (!reverse || (reverse && i - j > j)) && <circle
-                    className={style.circle}
-                    key={(reverse ? "R" : "L") + j}
-                    cx={(reverse ? (i - j) : j) * (R + R) + R + (settings.height - 1 - i) * R}
-                    cy={i * (R + R) + R}
-                    r={R}
-                    stroke="transparent"
-                    strokeWidth={1}
-                    fill={t.colored[i][j] ? settings.highlightColor : settings.color}
-                ></circle>
-            ))}
-        </React.Fragment>
-    );
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = settings.height * (R + R);
+        const height = settings.height * (R + R);
+
+        // High DPI scaling
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+
+        ctx.scale(dpr, dpr);
+        ctx.clearRect(0, 0, width, height);
+
+        for(let i = 0; i < settings.height; i++) {
+             if (!t.nums[i]) continue;
+
+             for(let j = 0; j < t.nums[i].length; j++) {
+                 // Draw left side (j)
+                 let cx = j * (R + R) + R + (settings.height - 1 - i) * R;
+                 let cy = i * (R + R) + R;
+
+                 let color = (hoveredCell?.r === i && hoveredCell?.c === j)
+                             ? "red"
+                             : (t.colored[i][j] ? settings.highlightColor : settings.color);
+
+                 ctx.beginPath();
+                 ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+                 ctx.fillStyle = color;
+                 ctx.fill();
+
+                 // Draw right side (i - j) if symmetric
+                 if (i - j > j) {
+                     let colRight = i - j;
+                     cx = colRight * (R + R) + R + (settings.height - 1 - i) * R;
+
+                     color = (hoveredCell?.r === i && hoveredCell?.c === colRight)
+                                 ? "red"
+                                 : (t.colored[i][j] ? settings.highlightColor : settings.color);
+
+                     ctx.beginPath();
+                     ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+                     ctx.fillStyle = color;
+                     ctx.fill();
+                 }
+             }
+        }
+
+    }, [t, settings, hoveredCell, R]);
 
     return (
         <>
-            <svg 
-                id="triangleSVG"
-                width={settings.height * (R + R)} 
-                height={settings.height * (R + R)}
-                onMouseMove={(e) => handleHover(e)}
-            >
-                {a.map((i) => getRow(i))}
-                {a.map((i) => getRow(i, true))}
-            </svg>
+            <canvas
+                ref={canvasRef}
+                style={{ cursor: 'pointer' }}
+                onMouseMove={handleHover}
+                onMouseLeave={() => setHoveredCell(null)}
+            />
             <Snackbar 
                 open={snackbarOpen}
                 autoHideDuration={6000} 
